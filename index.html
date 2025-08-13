@@ -214,10 +214,11 @@
         
         <img src="https://i.ibb.co/WWXpY1kz/70784257.gif" alt="Krishna Janmashtami GIF" class="krishna-gif" id="wishingGif">
         
-        <p id="instructionText">नीचे अपना नाम लिखें और जन्माष्टमी की शुभकामनाएँ भेजें!</p>
-
-        <input type="text" id="userName" placeholder="यहाँ अपना नाम लिखें...">
-        <button class="button" onclick="generateWish()">शुभकामनाएं देखें</button>
+        <div id="input-container">
+            <p id="instructionText">नीचे अपना नाम लिखें और जन्माष्टमी की शुभकामनाएँ भेजें!</p>
+            <input type="text" id="userName" placeholder="यहाँ अपना नाम लिखें...">
+            <button class="button" onclick="generateWish()">शुभकामनाएं देखें</button>
+        </div>
 
         <div id="animatedNameContainer"></div>
         <div id="wishingMessage" style="display:none;"></div>
@@ -227,6 +228,11 @@
             <a id="whatsappShare" href="#" class="share-btn whatsapp" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
             <a id="telegramShare" href="#" class="share-btn telegram" target="_blank"><i class="fab fa-telegram-plane"></i> Telegram</a>
             <a id="facebookShare" href="#" class="share-btn facebook" target="_blank"><i class="fab fa-facebook-f"></i> Facebook</a>
+        </div>
+        
+        <!-- === नया बटन यहाँ जोड़ा गया है === -->
+        <div id="createNewWishContainer" style="display:none; margin-top: 20px;">
+            <button class="button" id="createNewWishBtn">आप भी अपनी शुभकामनाएँ भेजें</button>
         </div>
     </div>
 
@@ -243,7 +249,7 @@
             try {
                 await audio.play();
             } catch (err) {
-                console.log("Audio play failed, but that's okay. User can still access the site.", err);
+                console.log("Audio play failed, but that's okay.", err);
             }
 
             setTimeout(() => {
@@ -252,12 +258,8 @@
         }
 
         enterButton.addEventListener('click', enterSite);
-
-        // --- नया और संशोधित कोड ---
-
-        // यह फंक्शन शुभकामना संदेश को प्रदर्शित करता है
+        
         function displayWish(name) {
-            // नाम और शुभकामना संदेश दिखाएँ
             const nameContainer = document.getElementById('animatedNameContainer');
             nameContainer.innerHTML = `<div class="animated-name">${name}</div>`;
             
@@ -270,11 +272,8 @@
             document.getElementById('shareButtons').style.display = 'block';
         }
 
-        // यह फंक्शन शेयर करने वाले लिंक बनाता है
         function setupShareLinks(userName) {
-            // यूआरएल से मौजूदा पैरामीटर हटाकर बेस यूआरएल प्राप्त करें
             const baseUrl = window.location.href.split('?')[0];
-            // नाम के साथ नया शेयर करने योग्य यूआरएल बनाएं
             const shareableUrl = `${baseUrl}?name=${encodeURIComponent(userName)}`;
 
             const fullWishText = `⭐ ${userName} की तरफ से आपको जन्माष्टमी की हार्दिक शुभकामनाएँ! ⭐\n\nयह शुभकामना संदेश इस विशेष पेज से भेजा गया है: ${shareableUrl}`;
@@ -284,12 +283,10 @@
             const encodedTelegramText = encodeURIComponent(telegramWishText);
 
             document.getElementById('whatsappShare').href = `https://api.whatsapp.com/send?text=${encodedFullText}`;
-            // टेलीग्राम के लिए सही यूआरएल फॉरमेट का उपयोग करें
             document.getElementById('telegramShare').href = `https://t.me/share/url?url=${encodeURIComponent(shareableUrl)}&text=${encodedTelegramText}`;
             document.getElementById('facebookShare').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareableUrl)}&quote=${encodedFullText}`;
         }
         
-        // यह फंक्शन तब चलता है जब आप "शुभकामनाएं देखें" बटन पर क्लिक करते हैं
         function generateWish() {
             const userNameInput = document.getElementById('userName');
             const userName = userNameInput.value.trim();
@@ -298,15 +295,11 @@
                 return;
             }
 
-            // शुभकामनाएँ दिखाएँ
             displayWish(userName);
-            // शेयर करने वाले लिंक सेट करें
             setupShareLinks(userName);
         }
 
-        // यह कोड पेज लोड होते ही चलता है
         document.addEventListener('DOMContentLoaded', function() {
-            // कणों (particles) को बनाने वाला कोड
             const particleContainer = document.getElementById('particle-container');
             const numberOfParticles = 40; 
             for (let i = 0; i < numberOfParticles; i++) {
@@ -323,24 +316,31 @@
                 particleContainer.appendChild(particle);
             }
 
-            // --- यहाँ मुख्य सुधार है ---
-            // जाँच करें कि क्या यूआरएल में किसी का नाम है
             const urlParams = new URLSearchParams(window.location.search);
             const nameFromUrl = urlParams.get('name');
 
             if (nameFromUrl) {
-                // अगर यूआरएल में नाम है, तो उसे डीकोड करें
                 const senderName = decodeURIComponent(nameFromUrl);
                 
-                // शुभकामना संदेश दिखाने के लिए इनपुट फॉर्म छिपाएं
-                document.getElementById('userName').style.display = 'none';
-                document.querySelector('.button[onclick="generateWish()"]').style.display = 'none';
-                document.getElementById('instructionText').innerHTML = `<strong>${senderName}</strong> जी ने आपके लिए यह शुभकामना भेजी है:`;
+                // इनपुट फॉर्म को छिपाएं
+                document.getElementById('input-container').style.display = 'none';
 
-                // सीधे शुभकामनाएँ प्रदर्शित करें
+                // शुभकामना संदेश दिखाएं
                 displayWish(senderName);
-                // प्राप्तकर्ता के लिए शेयर लिंक सेट करें ताकि वे आगे शेयर कर सकें
+                
+                // शेयर लिंक सेट करें (ताकि वे आपकी शुभकामना को आगे भेज सकें)
                 setupShareLinks(senderName);
+
+                // --- नया कोड यहाँ है ---
+                // "अपनी शुभकामनाएँ भेजें" बटन दिखाएँ
+                const createNewWishContainer = document.getElementById('createNewWishContainer');
+                createNewWishContainer.style.display = 'block';
+
+                const createNewWishBtn = document.getElementById('createNewWishBtn');
+                createNewWishBtn.addEventListener('click', function() {
+                    // पेज को बिना किसी पैरामीटर के रीलोड करें
+                    window.location.href = window.location.pathname;
+                });
             }
         });
     </script>
