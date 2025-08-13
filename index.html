@@ -225,15 +225,18 @@
 
         <div id="shareButtons" style="display:none;">
             <h3>इन मंगल शुभकामनाओं को साझा करें:</h3>
+            
+            <!-- === यहाँ बदलाव किया गया है === -->
+            <!-- इस बटन को शेयर बटन के ऊपर रखा गया है -->
+            <div id="createNewWishContainer" style="display:none; margin-bottom: 20px;">
+                <button class="button" id="createNewWishBtn">👉 आप भी अपनी शुभकामनाएँ भेजें 👈</button>
+            </div>
+
             <a id="whatsappShare" href="#" class="share-btn whatsapp" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
             <a id="telegramShare" href="#" class="share-btn telegram" target="_blank"><i class="fab fa-telegram-plane"></i> Telegram</a>
             <a id="facebookShare" href="#" class="share-btn facebook" target="_blank"><i class="fab fa-facebook-f"></i> Facebook</a>
         </div>
         
-        <!-- === नया बटन यहाँ जोड़ा गया है === -->
-        <div id="createNewWishContainer" style="display:none; margin-top: 20px;">
-            <button class="button" id="createNewWishBtn">आप भी अपनी शुभकामनाएँ भेजें</button>
-        </div>
     </div>
 
     <script>
@@ -322,23 +325,16 @@
             if (nameFromUrl) {
                 const senderName = decodeURIComponent(nameFromUrl);
                 
-                // इनपुट फॉर्म को छिपाएं
                 document.getElementById('input-container').style.display = 'none';
-
-                // शुभकामना संदेश दिखाएं
                 displayWish(senderName);
-                
-                // शेयर लिंक सेट करें (ताकि वे आपकी शुभकामना को आगे भेज सकें)
                 setupShareLinks(senderName);
 
-                // --- नया कोड यहाँ है ---
                 // "अपनी शुभकामनाएँ भेजें" बटन दिखाएँ
                 const createNewWishContainer = document.getElementById('createNewWishContainer');
                 createNewWishContainer.style.display = 'block';
 
                 const createNewWishBtn = document.getElementById('createNewWishBtn');
                 createNewWishBtn.addEventListener('click', function() {
-                    // पेज को बिना किसी पैरामीटर के रीलोड करें
                     window.location.href = window.location.pathname;
                 });
             }
