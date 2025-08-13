@@ -11,26 +11,31 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            background: #0f0c29;
             color: white;
             text-align: center;
             padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
             margin: 0;
+            overflow-x: hidden;
         }
-        .particles {
+        /* === पटाखों का एनिमेशन कैनवास === */
+        #fireworks-canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 1;
+            z-index: 1; /* कंटेंट के पीछे रहेगा */
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        }
+        .container-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            width: 100%;
+            position: relative;
+            z-index: 2; /* एनिमेशन के ऊपर रहेगा */
         }
         .container {
             background: rgba(255, 255, 255, 0.1);
@@ -41,8 +46,6 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
             max-width: 500px;
             width: 100%;
-            position: relative; 
-            z-index: 2;
         }
         
         .main-title-container {
@@ -51,108 +54,76 @@
             text-shadow: 0 0 10px #00e5ff, 0 0 20px #00e5ff, 3px 3px 8px rgba(0,0,0,0.7);
             margin-bottom: 20px;
         }
-        .title-line { line-height: 1.2; }
         .title-line.middle { font-size: 3.5em; }
-        .title-line.top, .title-line.bottom { font-size: 2em; }
         
-        p {
-            font-size: 1.1em;
-            color: #e0e0e0;
-            margin-top: 5px;
+        #countdown-timer {
+            margin: 20px 0; background: rgba(0, 0, 0, 0.2); padding: 15px;
+            border-radius: 15px; border: 1px solid #00E5FF;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
         }
+        #countdown-timer h3 {
+            margin: 0 0 10px 0; font-family: 'Teko', sans-serif;
+            font-size: 1.8em; color: #fff;
+        }
+        .timer-grid { display: flex; justify-content: space-around; }
+        .timer-unit { font-family: 'Teko', sans-serif; }
+        .timer-unit span { font-size: 2.5em; color: #00E5FF; }
+        .timer-unit p { font-size: 1em; margin: 0; color: #e0e0e0; }
+
         .krishna-gif {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            border-radius: 20px;
-            border: 3px solid #00E5FF;
-            margin: 20px auto;
+            width: 80%; height: 250px; object-position: center;: cover; border-radius: 20px;
+            border: 3px solid #00E5FF; margin: 20px auto;
             box-shadow: 0 0 20px rgba(0, 229, 255, 0.6);
         }
         
         input[type="text"] {
-            padding: 14px;
-            font-size: 1em;
-            border-radius: 50px;
-            border: 2px solid #00E5FF;
-            background: rgba(0,0,0,0.3);
-            color: white;
-            margin-top: 15px;
-            width: 90%;
-            text-align: center;
-            transition: all 0.3s ease;
+            padding: 14px; font-size: 1em; border-radius: 50px; border: 2px solid #00E5FF;
+            background: rgba(0,0,0,0.3); color: white; margin-top: 15px; width: 90%;
+            text-align: center; transition: all 0.3s ease;
         }
-        input:focus {
-            outline: none;
-            box-shadow: 0 0 10px #00E5FF;
-        }
-        input::placeholder { color: #ccc; }
+        input:focus { outline: none; box-shadow: 0 0 10px #00E5FF; }
 
         .button {
-            background: linear-gradient(45deg, #8E2DE2, #4A00E0);
-            color: white;
-            padding: 14px 30px;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.2em;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            display: block;
-            width: 90%;
-            margin-left: auto;
-            margin-right: auto;
+            background: linear-gradient(45deg, #8E2DE2, #4A00E0); color: white; padding: 14px 30px;
+            border: none; border-radius: 50px; font-size: 1.2em; font-weight: 600; cursor: pointer;
+            margin-top: 20px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            display: block; width: 90%; margin-left: auto; margin-right: auto;
         }
-        .button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(142, 45, 226, 0.6);
-        }
+        .button:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(142, 45, 226, 0.6); }
         
-        .animated-name-container { margin-top: 25px; }
         .animated-name {
-            font-family: 'Teko', sans-serif;
-            font-size: 3.5em;
-            color: #ffffff;
+            font-family: 'Teko', sans-serif; font-size: 3.5em; color: #ffffff;
             text-shadow: 0 0 15px #00e5ff, 2px 2px 8px rgba(0,0,0,0.7);
-            animation: text-3d-pop 1.5s ease-in-out;
-            margin: 0;
+            animation: text-3d-pop 1.5s ease-in-out; margin: 0;
         }
         @keyframes text-3d-pop {
             0% { transform: perspective(800px) rotateX(90deg) scale(0.8); opacity: 0; }
             100% { transform: perspective(800px) rotateX(0deg) scale(1); opacity: 1; }
         }
 
-        .share-buttons {
-            margin-top: 25px;
-            width: 90%;
-            margin-left: auto;
-            margin-right: auto;
-        }
+        .share-buttons { margin-top: 25px; width: 90%; margin-left: auto; margin-right: auto; }
         .share-btn {
-            display: block; padding: 12px 20px; margin: 10px 0; border-radius: 50px;
-            color: white; text-decoration: none; font-weight: bold; font-size: 1.1em;
-            transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: none;
+            display: block; padding: 12px 20px; margin: 10px 0; border-radius: 50px; color: white;
+            text-decoration: none; font-weight: bold; font-size: 1.1em; transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: none;
         }
-        .share-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.5); }
         .whatsapp { background: linear-gradient(45deg, #25D366, #128C7E); }
         .telegram { background: linear-gradient(45deg, #0088cc, #00AEEF); }
         .facebook { background: linear-gradient(45deg, #1877F2, #3b5998); }
         
-        .particle {
-            position: absolute; bottom: -20px; background: rgba(255, 255, 255, 0.15);
-            border-radius: 50%; animation: animateParticles linear infinite;
+        .ad-placeholder {
+            max-width: 100%; /* मोबाइल पर ओवरफ्लो होने से रोकता है */
+            min-height: 60px;
+            margin: 25px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        @keyframes animateParticles {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-120vh) scale(0.5); opacity: 0; }
-        }
-        
+
         #curtain-wrapper {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             z-index: 100; display: flex; justify-content: center; align-items: center;
-            flex-direction: column;
+            flex-direction: column; background: rgba(0,0,0,0.5);
         }
         .curtain {
             position: absolute; top: 0; width: 50vw; height: 100vh;
@@ -161,111 +132,179 @@
         }
         #curtain-left { left: 0; }
         #curtain-right { right: 0; }
-        
         #curtain-wrapper.open #curtain-left { transform: translateX(-100%); }
         #curtain-wrapper.open #curtain-right { transform: translateX(100%); }
+        #enter-button { z-index: 101; font-size: 1.5em; }
+        #curtain-text { z-index: 101; color: #4A00E0; font-weight: bold; margin-bottom: 20px; font-size: 1.2em; text-shadow: 1px 1px 2px #fff; }
 
-        #enter-button {
-            z-index: 101; background: linear-gradient(45deg, #8E2DE2, #4A00E0);
-            color: white; padding: 15px 35px; border: none; border-radius: 50px;
-            font-size: 1.5em; font-weight: 600; cursor: pointer;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        }
-        #curtain-text {
-            z-index: 101; color: #4A00E0; font-weight: bold; margin-bottom: 20px;
-            font-size: 1.2em; text-shadow: 1px 1px 2px #fff;
-        }
-        
         @media (max-width: 550px) {
-            .container { padding: 25px 20px; }
-            .title-line.middle { font-size: 2.6em; }
-            .title-line.top, .title-line.bottom { font-size: 1.5em; }
-            .krishna-gif { height: 250px; }
+            .container { padding: 20px 15px; }
+            .title-line.middle { font-size: 2.8em; }
+            .krishna-gif { height: 220px; }
             .animated-name { font-size: 2.8em; }
-            p { font-size: 1em; }
-            .button, .share-btn { font-size: 1.1em; }
-            #enter-button { font-size: 1.2em; }
-            #curtain-text { font-size: 1em; }
+            #countdown-timer h3 { font-size: 1.5em; }
+            .timer-unit span { font-size: 2em; }
+            .ad-placeholder { transform: scale(0.9); transform-origin: center; }
         }
     </style>
 </head>
 <body>
 
+    <canvas id="fireworks-canvas"></canvas>
+
     <div id="curtain-wrapper">
         <div class="curtain" id="curtain-left"></div>
         <div class="curtain" id="curtain-right"></div>
         <div id="curtain-text">शुभकामनाएँ पाने के लिए प्रवेश करें</div>
-        <button id="enter-button">प्रवेश करें</button>
+        <button id="enter-button" class="button">प्रवेश करें</button>
     </div>
     
     <audio id="bg-music" loop preload="auto">
         <source src="https://files.catbox.moe/1f8m5l.mp3" type="audio/mpeg">
     </audio>
     
-    <div class="particles" id="particle-container"></div>
-    
-    <div class="container">
-        
-        <div class="main-title-container">
-            <div class="title-line top"></div>
-            <div class="title-line middle">!! जय श्री कृष्णा !!</div>
-            <div class="title-line bottom"></div>
-        </div>
-        
-        <img src="https://i.ibb.co/WWXpY1kz/70784257.gif" alt="Krishna Janmashtami GIF" class="krishna-gif" id="wishingGif">
-        
-        <div id="input-container">
-            <p id="instructionText">नीचे अपना नाम लिखें और जन्माष्टमी की शुभकामनाएँ भेजें!</p>
-            <input type="text" id="userName" placeholder="यहाँ अपना नाम लिखें...">
-            <button class="button" onclick="generateWish()">शुभकामनाएं देखें</button>
-        </div>
-
-        <div id="animatedNameContainer"></div>
-        <div id="wishingMessage" style="display:none;"></div>
-
-        <div id="shareButtons" style="display:none;">
-            <h3>इन मंगल शुभकामनाओं को साझा करें:</h3>
+    <div class="container-wrapper">
+        <div class="container">
             
-            <!-- === यहाँ बदलाव किया गया है === -->
-            <!-- इस बटन को शेयर बटन के ऊपर रखा गया है -->
-            <div id="createNewWishContainer" style="display:none; margin-bottom: 20px;">
-                <button class="button" id="createNewWishBtn">👉 आप भी अपनी शुभकामनाएँ भेजें 👈</button>
+            <div class="main-title-container">
+                <div class="title-line middle">!! जय श्री कृष्णा !!</div>
             </div>
 
-            <a id="whatsappShare" href="#" class="share-btn whatsapp" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-            <a id="telegramShare" href="#" class="share-btn telegram" target="_blank"><i class="fab fa-telegram-plane"></i> Telegram</a>
-            <a id="facebookShare" href="#" class="share-btn facebook" target="_blank"><i class="fab fa-facebook-f"></i> Facebook</a>
+            <div id="countdown-timer">
+                <h3>जन्माष्टमी काउंटडाउन</h3>
+                <div class="timer-grid">
+                    <div class="timer-unit"><span id="days">0</span><p>दिन</p></div>
+                    <div class="timer-unit"><span id="hours">0</span><p>घंटे</p></div>
+                    <div class="timer-unit"><span id="minutes">0</span><p>मिनट</p></div>
+                    <div class="timer-unit"><span id="seconds">0</span><p>सेकंड</p></div>
+                </div>
+            </div>
+            
+            <img src="https://i.ibb.co/WWXpY1kz/70784257.gif" alt="Krishna Janmashtami GIF" class="krishna-gif">
+            
+            <div id="input-container">
+                <p id="instructionText">नीचे अपना नाम लिखें और शुभकामनाएँ भेजें!</p>
+                <input type="text" id="userName" placeholder="यहाँ अपना नाम लिखें...">
+                <button class="button" onclick="generateWish()">शुभकामनाएं देखें</button>
+            </div>
+
+            <div id="animatedNameContainer"></div>
+            <div id="wishingMessage" style="display:none;"></div>
+
+            <div class="ad-placeholder">
+                <script type="text/javascript">
+                    atOptions = { 'key' : 'f90557c1cc6d9927c3cbe722214109e5', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {} };
+                </script>
+                <script type="text/javascript" src="//correspondencebirthday.com/f90557c1cc6d9927c3cbe722214109e5/invoke.js"></script>
+            </div>
+
+            <div id="shareButtons" style="display:none;">
+                <h3>इन मंगल शुभकामनाओं को साझा करें:</h3>
+                <div id="createNewWishContainer" style="display:none; margin-bottom: 20px;">
+                    <button class="button" id="createNewWishBtn">👉 आप भी अपनी शुभकामनाएँ भेजें 👈</button>
+                </div>
+                <a id="whatsappShare" href="#" class="share-btn whatsapp" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                <a id="telegramShare" href="#" class="share-btn telegram" target="_blank"><i class="fab fa-telegram-plane"></i> Telegram</a>
+                <a id="facebookShare" href="#" class="share-btn facebook" target="_blank"><i class="fab fa-facebook-f"></i> Facebook</a>
+            </div>
+
+            <div class="ad-placeholder">
+                <script type="text/javascript">
+                    atOptions = { 'key' : 'f90557c1cc6d9927c3cbe722214109e5', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {} };
+                </script>
+                <script type="text/javascript" src="//correspondencebirthday.com/f90557c1cc6d9927c3cbe722214109e5/invoke.js"></script>
+            </div>
+            
         </div>
-        
     </div>
 
     <script>
+        // === बेहतर पटाखों का एनिमेशन स्क्रिप्ट ===
+        const canvas = document.getElementById('fireworks-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let fireworks = [];
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        function Firework(x, y, color) {
+            this.x = x; this.y = y; this.color = color; this.particles = [];
+            // कणों की संख्या बढ़ाई गई
+            const particleCount = 150; 
+            for (let i = 0; i < particleCount; i++) { this.particles.push(new Particle(this.x, this.y, this.color)); }
+        }
+        Firework.prototype.update = function() {
+            this.particles.forEach(p => p.update());
+            this.particles = this.particles.filter(p => p.alpha > 0);
+        }
+        Firework.prototype.draw = function() { this.particles.forEach(p => p.draw()); }
+
+        function Particle(x, y, color) {
+            this.x = x; this.y = y; this.color = color; this.alpha = 1;
+            // विस्फोट का फैलाव बढ़ाया गया
+            this.velocity = { x: (Math.random() - 0.5) * 12, y: (Math.random() - 0.5) * 12 };
+            this.friction = 0.97;
+        }
+        Particle.prototype.update = function() {
+            this.x += this.velocity.x; this.y += this.velocity.y;
+            this.velocity.x *= this.friction; this.velocity.y *= this.friction;
+            this.alpha -= 0.02;
+        }
+        Particle.prototype.draw = function() {
+            ctx.save(); ctx.globalAlpha = this.alpha; ctx.beginPath();
+            ctx.arc(this.x, this.y, 2, 0, Math.PI * 2, false);
+            ctx.fillStyle = this.color; ctx.fill(); ctx.restore();
+        }
+
+        function animateFireworks() {
+            ctx.fillStyle = 'rgba(15, 12, 41, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            fireworks.forEach(fw => { fw.update(); fw.draw(); });
+            fireworks = fireworks.filter(fw => fw.particles.length > 0);
+            requestAnimationFrame(animateFireworks);
+        }
+        // पटाखों की फ्रीक्वेंसी बढ़ाई गई
+        setInterval(() => {
+            const colors = ['#FFD700', '#FF4500', '#ADFF2F', '#00FFFF', '#FF1493', '#FFFFFF'];
+            fireworks.push(new Firework(Math.random() * canvas.width, Math.random() * canvas.height, colors[Math.floor(Math.random() * colors.length)]));
+        }, 1000); // हर सेकंड एक नया पटाखा
+        animateFireworks();
+
+        // === काउंटडाउन टाइमर स्क्रिप्ट ===
+        const countdownDate = new Date("Aug 16, 2025 00:00:00").getTime();
+        const timerInterval = setInterval(() => {
+            const now = new Date().getTime(); const distance = countdownDate - now;
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            document.getElementById("days").innerText = days < 10 ? '0' + days : days;
+            document.getElementById("hours").innerText = hours < 10 ? '0' + hours : hours;
+            document.getElementById("minutes").innerText = minutes < 10 ? '0' + minutes : minutes;
+            document.getElementById("seconds").innerText = seconds < 10 ? '0' + seconds : seconds;
+            if (distance < 0) {
+                clearInterval(timerInterval);
+                document.getElementById("countdown-timer").innerHTML = "<h3>जन्माष्टमी की शुभकामनाएँ!</h3>";
+            }
+        }, 1000);
+
+        // === बाकी का जावास्क्रिप्ट ===
         const enterButton = document.getElementById('enter-button');
         const audio = document.getElementById('bg-music');
         const curtainWrapper = document.getElementById('curtain-wrapper');
-
         async function enterSite() {
             curtainWrapper.classList.add('open');
-            enterButton.style.display = 'none';
-            document.getElementById('curtain-text').style.display = 'none';
-
-            try {
-                await audio.play();
-            } catch (err) {
-                console.log("Audio play failed, but that's okay.", err);
-            }
-
-            setTimeout(() => {
-                curtainWrapper.style.display = 'none';
-            }, 2100);
+            try { await audio.play(); } catch (err) { console.log("Audio play failed."); }
+            setTimeout(() => { curtainWrapper.style.display = 'none'; }, 2100);
         }
-
         enterButton.addEventListener('click', enterSite);
         
         function displayWish(name) {
-            const nameContainer = document.getElementById('animatedNameContainer');
-            nameContainer.innerHTML = `<div class="animated-name">${name}</div>`;
-            
+            document.getElementById('animatedNameContainer').innerHTML = `<div class="animated-name">${name}</div>`;
             const wishingMessageDiv = document.getElementById('wishingMessage');
             wishingMessageDiv.innerHTML = `
                 <p style="font-size: 1.2em; color: #fff; text-shadow: 1px 1px 2px #000;">की तरफ से आपको और आपके परिवार को</p>
@@ -278,68 +317,36 @@
         function setupShareLinks(userName) {
             const baseUrl = window.location.href.split('?')[0];
             const shareableUrl = `${baseUrl}?name=${encodeURIComponent(userName)}`;
-
             const fullWishText = `⭐ ${userName} की तरफ से आपको जन्माष्टमी की हार्दिक शुभकामनाएँ! ⭐\n\nयह शुभकामना संदेश इस विशेष पेज से भेजा गया है: ${shareableUrl}`;
             const encodedFullText = encodeURIComponent(fullWishText);
-            
-            const telegramWishText = `⭐ ${userName} की तरफ से आपको और आपके परिवार को जन्माष्टमी की हार्दिक शुभकामनाएँ! ⭐`;
-            const encodedTelegramText = encodeURIComponent(telegramWishText);
-
             document.getElementById('whatsappShare').href = `https://api.whatsapp.com/send?text=${encodedFullText}`;
-            document.getElementById('telegramShare').href = `https://t.me/share/url?url=${encodeURIComponent(shareableUrl)}&text=${encodedTelegramText}`;
+            document.getElementById('telegramShare').href = `https://t.me/share/url?url=${encodeURIComponent(shareableUrl)}&text=${encodedFullText}`;
             document.getElementById('facebookShare').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareableUrl)}&quote=${encodedFullText}`;
         }
         
         function generateWish() {
             const userNameInput = document.getElementById('userName');
             const userName = userNameInput.value.trim();
-            if (userName === "") {
-                alert("कृपया अपना नाम अवश्य लिखें।");
-                return;
-            }
-
+            if (userName === "") { alert("कृपया अपना नाम अवश्य लिखें।"); return; }
+            document.getElementById('input-container').style.display = 'none';
             displayWish(userName);
             setupShareLinks(userName);
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            const particleContainer = document.getElementById('particle-container');
-            const numberOfParticles = 40; 
-            for (let i = 0; i < numberOfParticles; i++) {
-                let particle = document.createElement('span');
-                particle.classList.add('particle');
-                let size = Math.random() * 8 + 2; 
-                particle.style.width = `${size}px`;
-                particle.style.height = `${size}px`;
-                particle.style.left = `${Math.random() * 100}%`;
-                let duration = Math.random() * 10 + 10;
-                particle.style.animationDuration = `${duration}s`;
-                let delay = Math.random() * 10;
-                particle.style.animationDelay = `${delay}s`;
-                particleContainer.appendChild(particle);
-            }
-
             const urlParams = new URLSearchParams(window.location.search);
             const nameFromUrl = urlParams.get('name');
-
             if (nameFromUrl) {
                 const senderName = decodeURIComponent(nameFromUrl);
-                
                 document.getElementById('input-container').style.display = 'none';
                 displayWish(senderName);
                 setupShareLinks(senderName);
-
-                // "अपनी शुभकामनाएँ भेजें" बटन दिखाएँ
-                const createNewWishContainer = document.getElementById('createNewWishContainer');
-                createNewWishContainer.style.display = 'block';
-
-                const createNewWishBtn = document.getElementById('createNewWishBtn');
-                createNewWishBtn.addEventListener('click', function() {
+                document.getElementById('createNewWishContainer').style.display = 'block';
+                document.getElementById('createNewWishBtn').addEventListener('click', () => {
                     window.location.href = window.location.pathname;
                 });
             }
         });
     </script>
-
 </body>
 </html>
